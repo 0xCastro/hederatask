@@ -147,6 +147,7 @@ HBAR price  = (total USD × 3x margin) / $0.25 × complexity
 |------|------|
 | Mateo Quintana | Full Stack & Blockchain |
 | Martin Gutter | Marketing |
+| Nicolás García | Full Stack |
 
 ---
 
