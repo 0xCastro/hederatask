@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HederaTask — Decentralized AI Agent Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#030712;--s1:#0d1117;--s2:#161b27;--s3:#1e2d3d;
+  --b:rgba(255,255,255,0.07);--bh:rgba(34,211,238,0.3);
+  --ac:#22d3ee;--ac2:#818cf8;--ac3:#34d399;--gold:#fbbf24;--rose:#fb7185;
+  --tx:#f1f5f9;--m:#64748b;--m2:#94a3b8;
+}
+*{scrollbar-width:thin;scrollbar-color:var(--s3) transparent}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+
+/* BG */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-g1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,0.055) 0%,transparent 70%);top:-200px;right:-200px}
+.bg-g2{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,0.06) 0%,transparent 70%);bottom:-100px;left:-150px}
+.bg-g3{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(52,211,153,0.04) 0%,transparent 70%);top:40%;left:40%}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(ellipse 100% 100% at 50% 0%,black 40%,transparent 100%)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;background:rgba(3,7,18,0.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000;box-shadow:0 0 20px rgba(34,211,238,0.25)}
+.logo-text{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-0.02em}
+.logo-text span{color:var(--ac)}
+.nav-center{display:flex;gap:4px}
+.nav-tab{padding:6px 14px;border-radius:8px;font-size:0.8rem;font-weight:500;color:var(--m2);cursor:pointer;transition:all 0.18s;border:none;background:transparent}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.nav-tab.active{color:var(--ac);background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.balance-pill{display:flex;align-items:center;gap:7px;padding:6px 14px;background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.18);border-radius:999px;font-size:0.73rem;color:var(--ac);cursor:default;transition:all 0.2s}
+.balance-pill:hover{background:rgba(34,211,238,0.1)}
+.dot-live{width:6px;height:6px;background:var(--ac3);border-radius:50%;animation:livepulse 2s infinite}
+@keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0.5)}50%{box-shadow:0 0 0 5px rgba(52,211,153,0)}}
+.testnet{padding:4px 10px;font-size:0.63rem;letter-spacing:0.1em;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);color:var(--gold);border-radius:999px}
+
+/* PAGES */
+.page{display:none;position:relative;z-index:1;animation:fadeUp 0.35s ease both}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ HERO ═══ */
+.hero{text-align:center;padding:72px 24px 56px;max-width:760px;margin:0 auto}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.2);border-radius:999px;font-size:0.72rem;color:var(--ac2);margin-bottom:28px}
+.hero-tag-dot{width:5px;height:5px;background:var(--ac2);border-radius:50%}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:800;letter-spacing:-0.04em;line-height:1.0;color:#fff;margin-bottom:20px}
+.hero h1 .grad{background:linear-gradient(135deg,var(--ac) 0%,var(--ac2) 50%,var(--ac3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:1.05rem;color:var(--m2);max-width:520px;margin:0 auto 44px;line-height:1.75;font-weight:300}
+.hero-metrics{display:inline-flex;align-items:center;gap:0;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:18px;padding:18px 36px;gap:36px}
+.metric{text-align:center}
+.metric-val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,#fff,var(--m2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.03em}
+.metric-val.c-ac{background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text}
+.metric-lbl{font-size:0.65rem;color:var(--m);margin-top:3px;letter-spacing:0.06em;text-transform:uppercase}
+.metric-sep{width:1px;height:44px;background:var(--b)}
+
+/* ═══ MARKETPLACE ═══ */
+.marketplace-layout{max-width:1160px;margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+.col-label{font-size:0.63rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--m);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.col-label::before{content:'';width:18px;height:1px;background:var(--m)}
+
+/* AGENT CARDS */
+.agents-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.agent{position:relative;background:var(--s1);border:1px solid var(--b);border-radius:18px;padding:22px;cursor:pointer;transition:all 0.22s cubic-bezier(0.4,0,0.2,1);overflow:hidden}
+.agent-glow{position:absolute;inset:0;opacity:0;transition:opacity 0.3s;pointer-events:none;border-radius:18px}
+.agent:hover .agent-glow{opacity:1}
+.agent:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.12)}
+.agent.sel{border-color:var(--ac);background:rgba(34,211,238,0.04);box-shadow:0 0 0 1px rgba(34,211,238,0.08),0 8px 32px rgba(34,211,238,0.07)}
+.agent.sel .agent-glow{opacity:1}
+.agent-glow-cyan{background:radial-gradient(ellipse at 20% 20%,rgba(34,211,238,0.1) 0%,transparent 65%)}
+.agent-glow-violet{background:radial-gradient(ellipse at 20% 20%,rgba(129,140,248,0.1) 0%,transparent 65%)}
+.agent-glow-green{background:radial-gradient(ellipse at 20% 20%,rgba(52,211,153,0.1) 0%,transparent 65%)}
+.agent-glow-rose{background:radial-gradient(ellipse at 20% 20%,rgba(251,113,133,0.1) 0%,transparent 65%)}
+.agent-check{position:absolute;top:12px;right:12px;width:20px;height:20px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:700;opacity:0;transform:scale(0) rotate(-90deg);transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1)}
+.agent.sel .agent-check{opacity:1;transform:scale(1) rotate(0)}
+.agent-votes{position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px;font-size:0.65rem;color:var(--m2);background:rgba(255,255,255,0.05);border:1px solid var(--b);padding:3px 7px;border-radius:999px}
+.agent.sel .agent-votes{display:none}
+.agent-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;transition:transform 0.2s}
+.agent:hover .agent-icon{transform:scale(1.1) rotate(-4deg)}
+.ic-c{background:rgba(34,211,238,0.1);box-shadow:0 0 0 1px rgba(34,211,238,0.12)}
+.ic-v{background:rgba(129,140,248,0.1);box-shadow:0 0 0 1px rgba(129,140,248,0.12)}
+.ic-g{background:rgba(52,211,153,0.1);box-shadow:0 0 0 1px rgba(52,211,153,0.12)}
+.ic-r{background:rgba(251,113,133,0.1);box-shadow:0 0 0 1px rgba(251,113,133,0.12)}
+.agent-name{font-size:0.88rem;font-weight:600;color:#fff;margin-bottom:4px}
+.agent-desc{font-size:0.73rem;color:var(--m2);line-height:1.5;font-weight:300}
+.agent-meta{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.agent-price{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:600;color:var(--ac3);background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.14);padding:3px 9px;border-radius:6px}
+.agent-creator{font-size:0.62rem;color:var(--m);font-family:'Inter',monospace}
+
+/* INPUT BOX */
+.input-card{background:var(--s1);border:1px solid var(--b);border-radius:18px;padding:22px;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:14px}
+.input-card:focus-within{border-color:rgba(34,211,238,0.3);box-shadow:0 0 0 3px rgba(34,211,238,0.05)}
+.input-top{font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--m);margin-bottom:14px;font-weight:600}
+textarea{width:100%;background:transparent;border:none;outline:none;color:var(--tx);font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:300;line-height:1.75;resize:none;min-height:120px}
+textarea::placeholder{color:var(--m)}
+.input-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--b);margin-top:10px}
+.char-hint{font-size:0.68rem;color:var(--m);font-variant-numeric:tabular-nums}
+.run-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:linear-gradient(135deg,var(--ac),#06b6d4);color:#000;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.run-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);opacity:0;transition:opacity 0.2s}
+.run-btn:hover::after{opacity:1}
+.run-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,211,238,0.28)}
+.run-btn:active{transform:none;box-shadow:none}
+.run-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* LOADER */
+.loader{display:none;align-items:center;gap:12px;padding:14px 18px;background:rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.14);border-radius:12px;margin-bottom:14px;font-size:0.78rem;color:var(--ac)}
+.loader.show{display:flex;animation:fadeUp 0.3s ease}
+.dots{display:flex;gap:5px}
+.dots span{width:6px;height:6px;background:var(--ac);border-radius:50%;animation:bounce 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:0.15s}
+.dots span:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-6px);opacity:1}}
+
+/* RIGHT COL */
+.right-col{display:flex;flex-direction:column;gap:16px;position:sticky;top:78px}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:18px;transition:border-color 0.2s}
+.stat:hover{border-color:rgba(255,255,255,0.11)}
+.stat-n{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.04em;background:linear-gradient(135deg,#fff,var(--m2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-l{font-size:0.65rem;color:var(--m);margin-top:3px;letter-spacing:0.06em;text-transform:uppercase}
+
+/* FEED */
+.feed-card{background:var(--s1);border:1px solid var(--b);border-radius:18px;overflow:hidden}
+.feed-head{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.015)}
+.feed-title{font-size:0.8rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px}
+.feed-cnt{font-size:0.62rem;background:var(--s2);border:1px solid var(--b);padding:2px 8px;border-radius:999px;color:var(--m2);font-variant-numeric:tabular-nums}
+.feed-body{max-height:400px;overflow-y:auto;padding:12px}
+.feed-empty{text-align:center;padding:36px 16px;color:var(--m)}
+.feed-empty-i{font-size:30px;margin-bottom:10px;opacity:0.3}
+.feed-item{padding:14px;border-radius:12px;margin-bottom:10px;background:rgba(3,7,18,0.5);border:1px solid var(--b);transition:border-color 0.2s;animation:itemIn 0.35s cubic-bezier(0.4,0,0.2,1)}
+.feed-item:hover{border-color:rgba(255,255,255,0.1)}
+@keyframes itemIn{from{opacity:0;transform:translateY(8px) scale(0.98)}to{opacity:1;transform:none}}
+.item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.item-tag{font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.t-s{background:rgba(34,211,238,0.1);color:var(--ac);border:1px solid rgba(34,211,238,0.18)}
+.t-t{background:rgba(129,140,248,0.1);color:var(--ac2);border:1px solid rgba(129,140,248,0.18)}
+.t-a{background:rgba(251,191,36,0.1);color:var(--gold);border:1px solid rgba(251,191,36,0.18)}
+.t-c{background:rgba(52,211,153,0.1);color:var(--ac3);border:1px solid rgba(52,211,153,0.18)}
+.item-time{font-size:0.62rem;color:var(--m)}
+.item-text{font-size:0.78rem;color:var(--m2);line-height:1.6;font-weight:300}
+.item-chain{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--b);font-size:0.62rem;color:var(--m)}
+.chain-badge{width:14px;height:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#000;font-weight:700;flex-shrink:0}
+
+/* ═══ PROPOSE PAGE ═══ */
+.propose-wrap{max-width:680px;margin:0 auto;padding:48px 24px 80px}
+.propose-hero{margin-bottom:40px}
+.propose-hero h2{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.03em;color:#fff;margin-bottom:10px}
+.propose-hero p{font-size:0.95rem;color:var(--m2);line-height:1.7;font-weight:300}
+.form-card{background:var(--s1);border:1px solid var(--b);border-radius:20px;padding:28px;margin-bottom:16px}
+.form-section{margin-bottom:24px}
+.form-section:last-child{margin-bottom:0}
+.form-label{font-size:0.68rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--m2);margin-bottom:10px}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--b);color:var(--tx);padding:12px 16px;border-radius:10px;font-family:'Inter',sans-serif;font-size:0.88rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.form-input:focus{border-color:rgba(34,211,238,0.35);box-shadow:0 0 0 3px rgba(34,211,238,0.05)}
+.form-input::placeholder{color:var(--m)}
+.form-textarea{min-height:90px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fee-slider-wrap{display:flex;align-items:center;gap:16px}
+.fee-slider{flex:1;accent-color:var(--ac)}
+.fee-val{font-size:0.9rem;font-weight:600;color:var(--ac);font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
+
+/* SPLIT PREVIEW */
+.split-preview{background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:18px;margin-top:16px}
+.split-title{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--m);margin-bottom:14px;font-weight:600}
+.split-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:12px;gap:2px}
+.split-seg{height:100%;border-radius:2px;transition:flex 0.3s}
+.split-rows{display:flex;flex-direction:column;gap:8px}
+.split-row{display:flex;align-items:center;justify-content:space-between;font-size:0.78rem}
+.split-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.split-name{color:var(--m2);display:flex;align-items:center;gap:8px}
+.split-pct{font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+
+.propose-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#000;border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.propose-btn:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(129,140,248,0.25)}
+
+/* ═══ COMMUNITY PAGE ═══ */
+.community-wrap{max-width:960px;margin:0 auto;padding:40px 24px 80px}
+.community-hero{margin-bottom:36px}
+.community-hero h2{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.03em;color:#fff;margin-bottom:10px}
+.community-hero p{font-size:0.92rem;color:var(--m2);line-height:1.7;font-weight:300}
+.proposals-list{display:flex;flex-direction:column;gap:14px}
+.proposal{background:var(--s1);border:1px solid var(--b);border-radius:18px;padding:22px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;transition:border-color 0.2s}
+.proposal:hover{border-color:rgba(255,255,255,0.11)}
+.proposal-left{}
+.proposal-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.proposal-name{font-size:0.95rem;font-weight:600;color:#fff}
+.proposal-status{font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.st-voting{background:rgba(251,191,36,0.1);color:var(--gold);border:1px solid rgba(251,191,36,0.18)}
+.st-approved{background:rgba(52,211,153,0.1);color:var(--ac3);border:1px solid rgba(52,211,153,0.18)}
+.st-review{background:rgba(129,140,248,0.1);color:var(--ac2);border:1px solid rgba(129,140,248,0.18)}
+.proposal-desc{font-size:0.8rem;color:var(--m2);line-height:1.55;font-weight:300;margin-bottom:12px}
+.proposal-meta{display:flex;align-items:center;gap:16px}
+.p-meta-item{font-size:0.68rem;color:var(--m);display:flex;align-items:center;gap:5px}
+.p-meta-item strong{color:var(--m2);font-weight:500}
+.vote-area{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:120px}
+.vote-bar-wrap{width:100%;height:6px;background:var(--s3);border-radius:3px;overflow:hidden}
+.vote-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac3),var(--ac));border-radius:3px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1)}
+.vote-pct{font-size:0.72rem;color:var(--ac3);font-weight:600}
+.vote-btns{display:flex;gap:8px}
+.vote-up,.vote-dn{padding:7px 14px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;border:1px solid;transition:all 0.18s}
+.vote-up{background:rgba(52,211,153,0.08);color:var(--ac3);border-color:rgba(52,211,153,0.2)}
+.vote-up:hover{background:rgba(52,211,153,0.15);transform:translateY(-1px)}
+.vote-dn{background:rgba(251,113,133,0.07);color:var(--rose);border-color:rgba(251,113,133,0.2)}
+.vote-dn:hover{background:rgba(251,113,133,0.14);transform:translateY(-1px)}
+.vote-up:disabled,.vote-dn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:999;background:var(--s1);border:1px solid rgba(52,211,153,0.3);border-radius:12px;padding:14px 20px;font-size:0.82rem;color:var(--ac3);display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:500;background:rgba(3,7,18,0.8);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid rgba(52,211,153,0.2);border-radius:22px;padding:32px;max-width:440px;width:90%;transform:scale(0.92);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1)}
+.modal-bg.open .modal{transform:scale(1)}
+.modal h3{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:8px}
+.modal p{font-size:0.85rem;color:var(--m2);line-height:1.65;margin-bottom:20px;font-weight:300}
+.modal-split{background:var(--s2);border-radius:12px;padding:16px;margin-bottom:22px}
+.modal-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:0.82rem}
+.modal-row:not(:last-child){border-bottom:1px solid var(--b)}
+.modal-row-name{color:var(--m2)}
+.modal-row-val{font-weight:600;color:#fff}
+.modal-row-val.ac{color:var(--ac)}
+.modal-row-val.g{color:var(--ac3)}
+.modal-close{width:100%;padding:12px;background:linear-gradient(135deg,var(--ac3),var(--ac));color:#000;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s}
+.modal-close:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(52,211,153,0.25)}
+
+@media(max-width:860px){
+  .marketplace-layout{grid-template-columns:1fr}
+  .right-col{position:static}
+  nav{padding:0 20px}
+  .nav-center{display:none}
+  .hero{padding:48px 20px 40px}
+  .hero-metrics{flex-direction:column;gap:16px;padding:18px 24px}
+  .metric-sep{display:none}
+  .form-row{grid-template-columns:1fr}
+  .proposal{grid-template-columns:1fr;gap:14px}
+  .vote-area{flex-direction:row;min-width:auto;justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="bg"><div class="bg-g1"></div><div class="bg-g2"></div><div class="bg-g3"></div><div class="grid"></div></div>
+
+<nav>
+  <a class="logo" href="#"><div class="logo-icon">H</div><span class="logo-text">Hedera<span>Task</span></span></a>
+  <div class="nav-center">
+    <button class="nav-tab active" onclick="showPage('marketplace',this)">Marketplace</button>
+    <button class="nav-tab" onclick="showPage('propose',this)">Propose Agent</button>
+    <button class="nav-tab" onclick="showPage('community',this)">Community</button>
+  </div>
+  <div class="nav-right">
+    <div class="testnet">TESTNET</div>
+    <div class="balance-pill"><div class="dot-live"></div><span id="balanceTxt">Loading…</span></div>
+  </div>
+</nav>
+
+<!-- ════════════════ MARKETPLACE ════════════════ -->
+<div id="page-marketplace" class="page active">
+  <div class="hero">
+    <div class="hero-tag"><div class="hero-tag-dot"></div>Decentralized AI Agent Marketplace on Hedera</div>
+    <h1>Hire <span class="grad">AI agents.</span><br>Pay in HBAR.</h1>
+    <p class="hero-sub">No subscriptions. No API keys. Just pick a task, pay micro-fees in HBAR, and an autonomous agent executes it — every result recorded on-chain forever.</p>
+    <div class="hero-metrics">
+      <div class="metric"><div class="metric-val c-ac" id="mTasks">0</div><div class="metric-lbl">Tasks executed</div></div>
+      <div class="metric-sep"></div>
+      <div class="metric"><div class="metric-val c-ac" id="mTopics">0</div><div class="metric-lbl">HCS topics</div></div>
+      <div class="metric-sep"></div>
+      <div class="metric"><div class="metric-val">4</div><div class="metric-lbl">Agent types</div></div>
+      <div class="metric-sep"></div>
+      <div class="metric"><div class="metric-val">905</div><div class="metric-lbl">HBAR balance</div></div>
+    </div>
+  </div>
+
+  <div class="marketplace-layout">
+    <div>
+      <div class="col-label">Choose your agent</div>
+      <div class="agents-grid">
+        <div class="agent sel" onclick="pickAgent(this,'summarize')">
+          <div class="agent-glow agent-glow-cyan"></div>
+          <div class="agent-check">✓</div>
+          <div class="agent-votes">▲ 2.4k</div>
+          <div class="agent-icon ic-c">📝</div>
+          <div class="agent-name">Summarize</div>
+          <div class="agent-desc">Condenses any content into sharp, clear key points</div>
+          <div class="agent-meta">
+            <div class="agent-price">⚡ 0.1 HBAR</div>
+            <div class="agent-creator">by community</div>
+          </div>
+        </div>
+        <div class="agent" onclick="pickAgent(this,'translate')">
+          <div class="agent-glow agent-glow-violet"></div>
+          <div class="agent-check">✓</div>
+          <div class="agent-votes">▲ 1.8k</div>
+          <div class="agent-icon ic-v">🌍</div>
+          <div class="agent-name">Translate</div>
+          <div class="agent-desc">Converts any language into precise English instantly</div>
+          <div class="agent-meta">
+            <div class="agent-price">⚡ 0.1 HBAR</div>
+            <div class="agent-creator">by community</div>
+          </div>
+        </div>
+        <div class="agent" onclick="pickAgent(this,'analyze')">
+          <div class="agent-glow agent-glow-green"></div>
+          <div class="agent-check">✓</div>
+          <div class="agent-votes">▲ 3.1k</div>
+          <div class="agent-icon ic-g">🔍</div>
+          <div class="agent-name">Sentiment</div>
+          <div class="agent-desc">Reads tone, emotion and hidden signals in any text</div>
+          <div class="agent-meta">
+            <div class="agent-price">⚡ 0.1 HBAR</div>
+            <div class="agent-creator">by community</div>
+          </div>
+        </div>
+        <div class="agent" onclick="pickAgent(this,'code')">
+          <div class="agent-glow agent-glow-rose"></div>
+          <div class="agent-check">✓</div>
+          <div class="agent-votes">▲ 1.2k</div>
+          <div class="agent-icon ic-r">💻</div>
+          <div class="agent-name">Explain Code</div>
+          <div class="agent-desc">Plain-English breakdown of any code snippet</div>
+          <div class="agent-meta">
+            <div class="agent-price">⚡ 0.2 HBAR</div>
+            <div class="agent-creator">by community</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-label">Your input</div>
+      <div class="loader" id="loader"><div class="dots"><span></span><span></span><span></span></div>Agent executing — writing result to Hedera…</div>
+      <div class="input-card">
+        <div class="input-top">Content for the agent</div>
+        <textarea id="taskInput" placeholder="Paste your text, article, code, or any content here…" rows="6"></textarea>
+        <div class="input-footer">
+          <span class="char-hint" id="charCount">0 characters</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span id="pricePreview" style="font-size:0.75rem;color:var(--ac3);font-weight:600;opacity:0;transition:opacity 0.3s"></span>
+            <button class="run-btn" id="runBtn" onclick="runTask()">Run Agent →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="col-label">Live stats</div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-n" id="statTasks">0</div><div class="stat-l">Tasks run</div></div>
+        <div class="stat"><div class="stat-n" id="statTopics">0</div><div class="stat-l">HCS topics</div></div>
+      </div>
+      <div class="feed-card">
+        <div class="feed-head">
+          <div class="feed-title"><div class="dot-live"></div>Live activity</div>
+          <span class="feed-cnt" id="feedCnt">0 tasks</span>
+        </div>
+        <div class="feed-body" id="feedBody">
+          <div class="feed-empty"><div class="feed-empty-i">🤖</div><p style="font-size:0.8rem;font-weight:300">No tasks yet.<br>Run your first agent above.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ PROPOSE ════════════════ -->
+<div id="page-propose" class="page">
+  <div class="propose-wrap">
+    <div class="propose-hero">
+      <h2>Propose a new agent 🧠</h2>
+      <p>Have an idea for an agent the community would love? Submit it here. The community votes — if it passes, your agent goes live and you earn 70% of every transaction forever.</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-section">
+        <div class="form-label">Agent name</div>
+        <input class="form-input" type="text" placeholder="e.g. Legal Contract Analyzer" id="pName">
+      </div>
+      <div class="form-section">
+        <div class="form-label">What does this agent do?</div>
+        <textarea class="form-input form-textarea" placeholder="Describe what your agent does in 1-2 sentences. Be specific — the community needs to understand it clearly." id="pDesc"></textarea>
+      </div>
+      <div class="form-section">
+        <div class="form-label">Agent system prompt</div>
+        <textarea class="form-input form-textarea" placeholder="You are an expert agent that... [tell the AI how to behave when executing this task]" id="pPrompt"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-section">
+          <div class="form-label">Category</div>
+          <select class="form-input" id="pCategory">
+            <option value="">Select category</option>
+            <option>Legal</option><option>Finance</option><option>Code</option>
+            <option>Writing</option><option>Research</option><option>Data</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-section">
+          <div class="form-label">Your Hedera account (creator)</div>
+          <input class="form-input" type="text" placeholder="0.0.XXXXXXX" id="pCreator">
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-label">Fee per task (HBAR)</div>
+        <div class="fee-slider-wrap">
+          <input type="range" class="fee-slider" min="0.1" max="2.0" step="0.1" value="0.5" id="feeSlider" oninput="updateFee(this.value)">
+          <span class="fee-val" id="feeVal">0.5 HBAR</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPLIT PREVIEW -->
+    <div class="form-card">
+      <div class="split-title">Revenue split preview</div>
+      <div class="split-bar">
+        <div class="split-seg" id="splitCreator" style="flex:70;background:linear-gradient(90deg,#34d399,#22d3ee)"></div>
+        <div class="split-seg" id="splitProtocol" style="flex:20;background:#fbbf24"></div>
+        <div class="split-seg" id="splitVoters" style="flex:10;background:#818cf8"></div>
+      </div>
+      <div class="split-rows">
+        <div class="split-row"><span class="split-name"><span class="split-dot" style="background:#34d399"></span>You (creator)</span><span class="split-pct" id="s-creator">0.35 HBAR — 70%</span></div>
+        <div class="split-row"><span class="split-name"><span class="split-dot" style="background:#fbbf24"></span>Protocol</span><span class="split-pct" id="s-protocol">0.10 HBAR — 20%</span></div>
+        <div class="split-row"><span class="split-name"><span class="split-dot" style="background:#818cf8"></span>Voters who approved</span><span class="split-pct" id="s-voters">0.05 HBAR — 10%</span></div>
+      </div>
+    </div>
+
+    <button class="propose-btn" onclick="submitProposal()">🚀 Submit proposal to community vote</button>
+  </div>
+</div>
+
+<!-- ════════════════ COMMUNITY ════════════════ -->
+<div id="page-community" class="page">
+  <div class="community-wrap">
+    <div class="community-hero">
+      <h2>Community votes 🗳️</h2>
+      <p>These agents were proposed by the community. Vote to approve or reject them. Approved agents go live on the marketplace and you earn 10% of their future revenue.</p>
+    </div>
+    <div class="proposals-list" id="proposalsList"></div>
+  </div>
+</div>
+
+<!-- MODAL: task result -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal">
+    <h3>✅ Agent completed</h3>
+    <p id="modalResult" style="max-height:160px;overflow-y:auto"></p>
+    <div class="modal-split">
+      <div class="modal-row"><span class="modal-row-name">Task fee paid</span><span class="modal-row-val ac" id="modalFee">0.1 HBAR</span></div>
+      <div class="modal-row"><span class="modal-row-name">Creator earned</span><span class="modal-row-val g">0.07 HBAR (70%)</span></div>
+      <div class="modal-row"><span class="modal-row-name">Protocol fee</span><span class="modal-row-val">0.02 HBAR (20%)</span></div>
+      <div class="modal-row"><span class="modal-row-name">Voter rewards</span><span class="modal-row-val">0.01 HBAR (10%)</span></div>
+      <div class="modal-row"><span class="modal-row-name">Hedera topic</span><span class="modal-row-val ac" id="modalTopic">—</span></div>
+    </div>
+    <button class="modal-close" onclick="document.getElementById('modalBg').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──
+let selectedTask = 'summarize';
+let taskCount = 0;
+
+// ── PROPOSALS DATA ──
+const proposals = [
+  { id:1, name:'Legal Contract Analyzer', desc:'Reads any legal contract and highlights risky clauses, obligations, and key terms in plain English.', status:'voting', fee:0.5, votes:142, total:200, creator:'0.0.4521033' },
+  { id:2, name:'SEO Keyword Extractor', desc:'Analyzes any piece of content and returns a ranked list of SEO keywords with difficulty scores.', status:'approved', fee:0.3, votes:310, total:340, creator:'0.0.3318821' },
+  { id:3, name:'Email Tone Rewriter', desc:'Takes any email and rewrites it to be more professional, friendly, or assertive — your choice.', status:'review', fee:0.2, votes:89, total:200, creator:'0.0.9912045' },
+];
+const voted = {};
+
+// ── NAVIGATION ──
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id === 'community') renderProposals();
+}
+
+// ── AGENT PICK ──
+function pickAgent(el, type) {
+  document.querySelectorAll('.agent').forEach(a => a.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedTask = type;
+}
+
+// ── CHAR COUNT ──
+let priceTimer = null;
+document.getElementById('taskInput').addEventListener('input', function(){
+  const n = this.value.length;
+  document.getElementById('charCount').textContent = n.toLocaleString() + ' character' + (n===1?'':'s');
+  clearTimeout(priceTimer);
+  const preview = document.getElementById('pricePreview');
+  if (n < 20) { preview.style.opacity = '0'; return; }
+  priceTimer = setTimeout(async () => {
+    try {
+      const r = await fetch('/api/price', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ content: this.value, taskType: selectedTask })
+      });
+      const d = await r.json();
+      if (d.success) {
+        preview.textContent = `⚡ ${d.price.hbar} HBAR (~$${(d.price.hbar * 0.25).toFixed(4)})`;
+        preview.style.opacity = '1';
+      } else {
+        preview.textContent = '⚠️ ' + d.error;
+        preview.style.color = 'var(--rose)';
+        preview.style.opacity = '1';
+      }
+    } catch {}
+  }, 600);
+});
+
+// ── BALANCE ──
+async function loadBalance() {
+  try {
+    const r = await fetch('/api/balance');
+    const d = await r.json();
+    document.getElementById('balanceTxt').textContent = d.balance;
+  } catch { document.getElementById('balanceTxt').textContent = 'Unavailable'; }
+}
+
+// ── RUN TASK ──
+async function runTask() {
+  const content = document.getElementById('taskInput').value.trim();
+  if (!content) { document.getElementById('taskInput').focus(); return; }
+  const btn = document.getElementById('runBtn');
+  const loader = document.getElementById('loader');
+  btn.disabled = true; loader.classList.add('show');
+  try {
+    const res = await fetch('/api/task', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ taskType: selectedTask, content })
+    });
+    const data = await res.json();
+    if (data.success) {
+      taskCount++;
+      document.getElementById('statTasks').textContent = taskCount;
+      document.getElementById('statTopics').textContent = taskCount;
+      document.getElementById('mTasks').textContent = taskCount;
+      document.getElementById('mTopics').textContent = taskCount;
+      document.getElementById('feedCnt').textContent = taskCount + ' task' + (taskCount===1?'':'s');
+      addFeedItem(selectedTask, data.result, data.topicId);
+      showModal(data.result, data.topicId);
+      loadBalance();
+    } else { showToast('❌ Error: ' + data.error, true); }
+  } catch(e) { showToast('❌ Connection error', true); }
+  finally { btn.disabled = false; loader.classList.remove('show'); }
+}
+
+function addFeedItem(type, result, topicId) {
+  const body = document.getElementById('feedBody');
+  const empty = body.querySelector('.feed-empty');
+  if (empty) empty.remove();
+  const tags = {summarize:'t-s',translate:'t-t',analyze:'t-a',code:'t-c'};
+  const labels = {summarize:'Summarize',translate:'Translate',analyze:'Sentiment',code:'Code'};
+  const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const preview = result.length > 200 ? result.slice(0,200)+'…' : result;
+  const el = document.createElement('div');
+  el.className = 'feed-item';
+  el.innerHTML = `<div class="item-top"><span class="item-tag ${tags[type]||'t-s'}">${labels[type]||type}</span><span class="item-time">${now}</span></div><div class="item-text">${preview}</div><div class="item-chain"><div class="chain-badge">H</div>Hedera HCS · Topic ${topicId}</div>`;
+  body.insertBefore(el, body.firstChild);
+}
+
+// ── MODAL ──
+function showModal(result, topicId) {
+  document.getElementById('modalResult').textContent = result;
+  document.getElementById('modalTopic').textContent = topicId;
+  document.getElementById('modalBg').classList.add('open');
+}
+function closeModal(e) { if(e.target === document.getElementById('modalBg')) document.getElementById('modalBg').classList.remove('open'); }
+
+// ── FEE SLIDER ──
+function updateFee(v) {
+  const f = parseFloat(v);
+  document.getElementById('feeVal').textContent = f.toFixed(1) + ' HBAR';
+  document.getElementById('s-creator').textContent = (f*0.7).toFixed(2) + ' HBAR — 70%';
+  document.getElementById('s-protocol').textContent = (f*0.2).toFixed(2) + ' HBAR — 20%';
+  document.getElementById('s-voters').textContent = (f*0.1).toFixed(2) + ' HBAR — 10%';
+}
+updateFee(0.5);
+
+// ── SUBMIT PROPOSAL ──
+function submitProposal() {
+  const name = document.getElementById('pName').value.trim();
+  const desc = document.getElementById('pDesc').value.trim();
+  if (!name || !desc) { showToast('⚠️ Fill in name and description'); return; }
+  const fee = parseFloat(document.getElementById('feeSlider').value);
+  proposals.unshift({ id: Date.now(), name, desc, status:'voting', fee, votes:0, total:100, creator: document.getElementById('pCreator').value || '0.0.????' });
+  showToast('🎉 Proposal submitted! Community voting starts now.');
+  document.getElementById('pName').value = '';
+  document.getElementById('pDesc').value = '';
+  document.getElementById('pPrompt').value = '';
+  setTimeout(() => showPage('community', document.querySelectorAll('.nav-tab')[2]), 1200);
+}
+
+// ── PROPOSALS ──
+function renderProposals() {
+  const list = document.getElementById('proposalsList');
+  list.innerHTML = '';
+  proposals.forEach(p => {
+    const pct = Math.round((p.votes / p.total) * 100);
+    const statusClass = {voting:'st-voting',approved:'st-approved',review:'st-review'}[p.status];
+    const statusLabel = {voting:'Voting open',approved:'✓ Approved',review:'In review'}[p.status];
+    const hasVoted = voted[p.id];
+    const div = document.createElement('div');
+    div.className = 'proposal';
+    div.innerHTML = `
+      <div class="proposal-left">
+        <div class="proposal-top">
+          <span class="proposal-name">${p.name}</span>
+          <span class="proposal-status ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="proposal-desc">${p.desc}</div>
+        <div class="proposal-meta">
+          <span class="p-meta-item">Fee: <strong>${p.fee} HBAR</strong></span>
+          <span class="p-meta-item">Creator earns: <strong>${(p.fee*0.7).toFixed(2)} HBAR/task</strong></span>
+          <span class="p-meta-item">By: <strong>${p.creator}</strong></span>
+        </div>
+      </div>
+      <div class="vote-area">
+        <span class="vote-pct">${pct}% approval</span>
+        <div class="vote-bar-wrap"><div class="vote-bar-fill" style="width:${pct}%"></div></div>
+        <span style="font-size:0.68rem;color:var(--m)">${p.votes} / ${p.total} votes</span>
+        <div class="vote-btns">
+          <button class="vote-up" ${hasVoted||p.status!=='voting'?'disabled':''} onclick="castVote(${p.id},true)">▲ For</button>
+          <button class="vote-dn" ${hasVoted||p.status!=='voting'?'disabled':''} onclick="castVote(${p.id},false)">▼ Against</button>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function castVote(id, up) {
+  const p = proposals.find(x => x.id === id);
+  if (!p || voted[id]) return;
+  if (up) p.votes = Math.min(p.votes + 1, p.total);
+  voted[id] = true;
+  if (p.votes >= p.total * 0.75) p.status = 'approved';
+  renderProposals();
+  showToast(up ? '✅ Vote cast — you\'ll earn 10% of this agent\'s revenue!' : '✅ Vote recorded.');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+loadBalance();
+</script>
+</body>
+</html>
