@@ -159,7 +159,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## 🔗 Links
 
-- **Demo Video:** [YouTube link]
-- **Live Demo:** [https://hederatask-production.up.railway.app/)
+- **Demo Video:** https://www.loom.com/share/05a1ec41263a46ecb594d67bc69d9d04
+- **Live Demo:** https://hederatask-production.up.railway.app/
 - **Hedera Testnet Explorer:** [hashscan.io](https://hashscan.io/testnet)
 - **Hackathon:** [hellofuturehackathon.dev](https://hellofuturehackathon.dev)
